@@ -1,0 +1,47 @@
+server:
+  port: 5001
+
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/z_blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: jiangxia
+    password: "jiangxia123!@#"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none  # 使用现有表结构，不自动建表
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 1
+
+  jackson:
+    time-zone: Asia/Shanghai
+    date-format: yyyy-MM-dd HH:mm:ss
+
+  mail:
+    host: smtp.163.com
+    port: 465
+    username: jiang_xia_top@163.com
+    password: BCqhazrCuMmiZyvh
+    properties:
+      mail:
+        smtp:
+          auth: true
+          ssl:
+            enable: true
+
+jwt:
+  secret: xia-007
+  # 8 小时，单位秒
+  expiration-seconds: 28800
+
+blog:
+  file-upload-path: d:/study/myGithub/blog-server/public/uploads/

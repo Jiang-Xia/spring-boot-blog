@@ -1,0 +1,92 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息,请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot - Dev (开发环境)",
+            "request": "launch",
+            "mainClass": "com.jiangxia.blog.BlogApplication",
+            "projectName": "blog-spring-boot",
+            "args": "--spring.profiles.active=dev",
+            "vmArgs": "-Dspring.devtools.restart.enabled=true -Dspring.devtools.livereload.enabled=true -Xms256m -Xmx512m -Dfile.encoding=UTF-8",
+            "console": "integratedTerminal",
+            "env": {
+                "SPRING_OUTPUT_ANSI_ENABLED": "ALWAYS"
+            },
+            "preLaunchTask": null
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot - Debug (调试模式)",
+            "request": "launch",
+            "mainClass": "com.jiangxia.blog.BlogApplication",
+            "projectName": "blog-spring-boot",
+            "vmArgs": "-Xms256m -Xmx512m -Dfile.encoding=UTF-8 -Dspring.jmx.enabled=true",
+            "console": "integratedTerminal",
+            "shortenCommandLine": "auto",
+            "env": {
+                "SPRING_OUTPUT_ANSI_ENABLED": "ALWAYS",
+                "DEBUG": "true"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot - Prod Simulation (生产模拟)",
+            "request": "launch",
+            "mainClass": "com.jiangxia.blog.BlogApplication",
+            "projectName": "blog-spring-boot",
+            "args": "--spring.profiles.active=prod",
+            "vmArgs": "-Xms512m -Xmx1024m -Dfile.encoding=UTF-8 -XX:+UseG1GC -XX:MaxGCPauseMillis=200",
+            "console": "integratedTerminal",
+            "env": {
+                "SPRING_OUTPUT_ANSI_ENABLED": "DETECT"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot - Test (测试环境)",
+            "request": "launch",
+            "mainClass": "com.jiangxia.blog.BlogApplication",
+            "projectName": "blog-spring-boot",
+            "args": "--spring.profiles.active=test --server.port=5002",
+            "vmArgs": "-Xms256m -Xmx512m -Dfile.encoding=UTF-8",
+            "console": "integratedTerminal",
+            "env": {
+                "SPRING_OUTPUT_ANSI_ENABLED": "ALWAYS"
+            }
+        },
+        {
+            "type": "java",
+            "name": "Remote Debug (远程调试)",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 5005,
+            "projectName": "blog-spring-boot"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot - SQL Debug (SQL调试)",
+            "request": "launch",
+            "mainClass": "com.jiangxia.blog.BlogApplication",
+            "projectName": "blog-spring-boot",
+            "vmArgs": "-Xms256m -Xmx512m -Dfile.encoding=UTF-8",
+            "console": "integratedTerminal",
+            "env": {
+                "SPRING_OUTPUT_ANSI_ENABLED": "ALWAYS",
+                "LOGGING_LEVEL_SQL": "DEBUG",
+                "SPRING_JPA_SHOW_SQL": "true",
+                "SPRING_JPA_PROPERTIES_HIBERNATE_FORMAT_SQL": "true"
+            },
+            "args": "--logging.level.org.hibernate.SQL=DEBUG --logging.level.org.hibernate.type.descriptor.sql.BasicBinder=TRACE --spring.jpa.show-sql=true"
+        }
+    ]
+}
