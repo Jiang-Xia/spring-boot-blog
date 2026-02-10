@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  # 开发环境应用服务
+  blog-app-dev:
+    build: .
+    container_name: spring-boot-blog-dev
+    ports:
+      - "5001:5001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - DB_PASSWORD=jiangxia123!@#
+      - JWT_SECRET=xia-007-default-secret-for-dev
+      - REDIS_PASSWORD=
+      - MAIL_PASSWORD=BCqhazrCuMmiZyvh
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+      # 映射源代码目录用于热重载（如果需要）
+      # - .:/app/src
+    depends_on:
+      - db-dev
+      - redis-dev
+    networks:
+      - blog-dev-network
+    restart: "no"  # 开发环境不需要自动重启
+
+  # 开发环境MySQL数据库
+  db-dev:
+    image: mysql:8.0
+    container_name: blog-mysql-dev
+    ports:
+      - "3307:3306"  # 使用不同的端口避免冲突
+    environment:
+      MYSQL_ROOT_PASSWORD: root123!@#
+      MYSQL_DATABASE: z_blog_dev
+      MYSQL_USER: jiangxia
+      MYSQL_PASSWORD: jiangxia123!@#
+    volumes:
+      - mysql_dev_data:/var/lib/mysql
+      - ./database_init_rbac.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - blog-dev-network
+    command: >
+      --innodb-buffer-pool-size=128M
+      --max-connections=100
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+
+  # 开发环境Redis
+  redis-dev:
+    image: redis:7-alpine
+    container_name: blog-redis-dev
+    ports:
+      - "6380:6379"  # 使用不同的端口避免冲突
+    volumes:
+      - redis_dev_data:/data
+    networks:
+      - blog-dev-network
+    command: redis-server --appendonly yes
+
+networks:
+  blog-dev-network:
+    driver: bridge
+
+volumes:
+  mysql_dev_data:
+  redis_dev_data:

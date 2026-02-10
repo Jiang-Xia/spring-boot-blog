@@ -52,4 +52,24 @@ public class Privilege {
 
     @ManyToMany(mappedBy = "privileges")
     private Set<Role> roles;
+
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        updateTime = LocalDateTime.now();
+        if (isVisible == null) {
+            isVisible = true;
+        }
+        if (isPublic == null) {
+            isPublic = false;
+        }
+        if (requireOwnership == null) {
+            requireOwnership = false;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateTime = LocalDateTime.now();
+    }
 }

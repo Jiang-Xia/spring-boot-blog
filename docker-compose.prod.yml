@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  # 生产环境应用服务
+  blog-app-prod:
+    build: .
+    container_name: spring-boot-blog-prod
+    ports:
+      - "5001:5001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      - DB_PASSWORD=${PROD_DB_PASSWORD}
+      - JWT_SECRET=${PROD_JWT_SECRET}
+      - REDIS_PASSWORD=${PROD_REDIS_PASSWORD}
+      - MAIL_PASSWORD=${PROD_MAIL_PASSWORD}
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      - db-prod
+      - redis-prod
+    networks:
+      - blog-prod-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    # 资源限制
+    deploy:
+      resources:
+        limits:
+          cpus: '2'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 512M
+
+  # 生产环境MySQL数据库
+  db-prod:
+    image: mysql:8.0
+    container_name: blog-mysql-prod
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      MYSQL_DATABASE: z_blog_prod
+      MYSQL_USER: jiangxia
+      MYSQL_PASSWORD_FILE: /run/secrets/db_password
+    volumes:
+      - mysql_prod_data:/var/lib/mysql
+      - ./database_init_rbac.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./mysql-prod.cnf:/etc/mysql/conf.d/custom.cnf
+    networks:
+      - blog-prod-network
+    restart: always
+    secrets:
+      - db_root_password
+      - db_password
+    command: >
+      --innodb-buffer-pool-size=1G
+      --max-connections=500
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+
+  # 生产环境Redis
+  redis-prod:
+    image: redis:7-alpine
+    container_name: blog-redis-prod
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_prod_data:/data
+      - ./redis-prod.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - blog-prod-network
+    restart: always
+    secrets:
+      - redis_password
+    command: redis-server /usr/local/etc/redis/redis.conf
+
+networks:
+  blog-prod-network:
+    driver: bridge
+
+volumes:
+  mysql_prod_data:
+  redis_prod_data:
+
+secrets:
+  db_root_password:
+    file: ./secrets/db_root_password.txt
+  db_password:
+    file: ./secrets/db_password.txt
+  redis_password:
+    file: ./secrets/redis_password.txt

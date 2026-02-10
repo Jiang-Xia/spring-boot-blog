@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 测试环境日志配置 - 继承开发环境配置 -->
+<Configuration status="WARN">
+    <Properties>
+        <!-- 测试环境日志配置 -->
+        <Property name="LOG_HOME">logs</Property>
+        <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
+        <Property name="MAX_FILE_SIZE">50MB</Property>
+        <Property name="MAX_HISTORY">15</Property>
+    </Properties>
+
+    <Appenders>
+        <!-- 控制台输出 -->
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+        </Console>
+
+        <!-- 应用程序日志文件 -->
+        <RollingFile name="ApplicationFile" 
+                     fileName="${LOG_HOME}/test-application.log"
+                     filePattern="${LOG_HOME}/test-application-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_HISTORY}"/>
+        </RollingFile>
+
+        <!-- API日志文件 -->
+        <RollingFile name="ApiFile" 
+                     fileName="${LOG_HOME}/test-api.log"
+                     filePattern="${LOG_HOME}/test-api-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_HISTORY}"/>
+        </RollingFile>
+
+        <!-- 错误日志文件 -->
+        <RollingFile name="ErrorFile" 
+                     fileName="${LOG_HOME}/test-error.log"
+                     filePattern="${LOG_HOME}/test-error-%d{yyyy-MM-dd}-%i.log.gz">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="${MAX_FILE_SIZE}"/>
+            </Policies>
+            <DefaultRolloverStrategy max="${MAX_HISTORY}"/>
+            <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+        </RollingFile>
+    </Appenders>
+
+    <Loggers>
+        <!-- API日志记录器 -->
+        <Logger name="com.jiangxia.blog.aspect.ApiLoggingAspect" level="DEBUG" additivity="false">
+            <AppenderRef ref="ApiFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- 应用程序主日志记录器 -->
+        <Logger name="com.jiangxia.blog" level="DEBUG" additivity="false">
+            <AppenderRef ref="ApplicationFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- 错误日志记录器 -->
+        <Logger name="errorLogger" level="ERROR" additivity="false">
+            <AppenderRef ref="ErrorFile"/>
+            <AppenderRef ref="Console"/>
+        </Logger>
+
+        <!-- 根日志记录器 -->
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+            <AppenderRef ref="ApplicationFile"/>
+        </Root>
+    </Loggers>
+</Configuration>

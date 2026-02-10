@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  # 主应用服务
+  blog-app:
+    build: .
+    container_name: spring-boot-blog
+    ports:
+      - "5001:5001"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+      - DB_PASSWORD=${DB_PASSWORD:-jiangxia123!@#}
+      - JWT_SECRET=${JWT_SECRET:-xia-007-default-secret}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+      - MAIL_PASSWORD=${MAIL_PASSWORD:-BCqhazrCuMmiZyvh}
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    depends_on:
+      - db
+      - redis
+    networks:
+      - blog-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5001/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # MySQL数据库
+  db:
+    image: mysql:8.0
+    container_name: blog-mysql
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root123!@#
+      MYSQL_DATABASE: z_blog
+      MYSQL_USER: jiangxia
+      MYSQL_PASSWORD: ${DB_PASSWORD:-jiangxia123!@#}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database_init_rbac.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - blog-network
+    restart: unless-stopped
+    command: >
+      --innodb-buffer-pool-size=256M
+      --max-connections=200
+      --sql-mode=STRICT_TRANS_TABLES,NO_ZERO_DATE,NO_ZERO_IN_DATE,ERROR_FOR_DIVISION_BY_ZERO
+
+  # Redis缓存
+  redis:
+    image: redis:7-alpine
+    container_name: blog-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    networks:
+      - blog-network
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-}
+
+networks:
+  blog-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+  redis_data:

@@ -6,9 +6,17 @@ import com.jiangxia.blog.user.dto.LoginRequest;
 import com.jiangxia.blog.user.dto.LoginResponse;
 import com.jiangxia.blog.user.entity.User;
 import com.jiangxia.blog.user.service.UserService;
+import com.jiangxia.blog.user.vo.TokenVO;
+import com.jiangxia.blog.user.vo.UserInfoVO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
+@Tag(name = "认证模块", description = "用户登录认证相关接口")
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -20,16 +28,10 @@ public class AuthController {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
-
-    @PostMapping("/login")
-    public ApiResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        User user = userService.login(request.getUsername(), request.getPassword());
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername());
-        return ApiResponse.success(new LoginResponse(token));
-    }
-
+    @Operation(summary = "公开测试接口", description = "用于测试公开接口是否可访问")
     @GetMapping("/test")
-    public ApiResponse<String> publicTest() {
-        return ApiResponse.success("public auth test ok");
+    public String publicTest() {
+        // 现在可以不手动包装，由GlobalResponseAdvice自动处理
+        return "public auth test ok";
     }
 }

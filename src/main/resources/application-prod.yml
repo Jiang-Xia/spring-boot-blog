@@ -1,0 +1,60 @@
+spring:
+  datasource:
+    hikari:
+      maximum-pool-size: 50
+      minimum-idle: 10
+      idle-timeout: 600000
+      max-lifetime: 1200000
+      connection-timeout: 60000
+      validation-timeout: 10000
+      leak-detection-threshold: 60000
+
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        generate_statistics: false
+
+  data:
+    redis:
+      timeout: 5000ms
+      jedis:
+        pool:
+          max-active: 50
+          max-idle: 20
+          min-idle: 10
+
+server:
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 20
+    max-http-form-post-size: 20MB
+    max-swallow-size: 20MB
+
+# 生产环境日志配置已移至 log4j2-prod.xml
+# 此处保留空的 logging 配置以避免冲突
+logging:
+  level:
+    root: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: logs/spring-boot-blog-prod.log
+    max-size: 100MB
+    max-history: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  metrics:
+    export:
+      prometheus:
+        enabled: true

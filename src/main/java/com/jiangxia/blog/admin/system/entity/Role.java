@@ -1,5 +1,6 @@
 package com.jiangxia.blog.admin.system.entity;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.jiangxia.blog.admin.menu.entity.Menu;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -19,9 +20,11 @@ public class Role {
     private Long id;
 
     @Column(name = "createTime", nullable = false)
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;
 
     @Column(name = "updateTime", nullable = false)
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
 
     @Column(name = "roleName", nullable = false, length = 255)
@@ -45,4 +48,15 @@ public class Role {
             inverseJoinColumns = @JoinColumn(name = "menuId")
     )
     private Set<Menu> menus;
+
+    @PrePersist
+    protected void onCreate() {
+        createTime = LocalDateTime.now();
+        updateTime = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updateTime = LocalDateTime.now();
+    }
 }

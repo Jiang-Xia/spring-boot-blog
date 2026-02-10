@@ -44,10 +44,10 @@ public class RoleServiceSupport {
             node.setName(menu.getName());
             node.setMenuCnName(menu.getMenuCnName());
             node.setOrderNum(menu.getOrderNum());
-            node.setIcon(menu.getIcon());
-            node.setLocale(menu.getLocale());
-            node.setRequiresAuth(menu.getRequiresAuth());
-            node.setFilePath(menu.getFilePath());
+//            node.setIcon(menu.getIcon());
+//            node.setLocale(menu.getLocale());
+//            node.setRequiresAuth(menu.getRequiresAuth());
+//            node.setFilePath(menu.getFilePath());
             node.setLabel(menu.getMenuCnName() != null && !menu.getMenuCnName().isEmpty()
                     ? menu.getMenuCnName() : menu.getName());
             node.setValue(menu.getId());

@@ -1,0 +1,344 @@
+### Spring Boot Blog API 测试文件
+### 使用 REST Client 扩展 (VS Code) 或 IntelliJ IDEA HTTP Client
+
+### 变量定义
+@baseUrl = http://localhost:5001
+@token = your_jwt_token_here
+
+### ============================================
+### 1. 测试公开接口
+### ============================================
+
+### 1.1 公开测试接口
+GET {{baseUrl}}/auth/test
+Content-Type: application/json
+
+
+### ============================================
+### 2. 认证相关接口
+### ============================================
+
+### 2.1 用户登录 (需要先在数据库中有用户数据)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "username": "18888888888",
+  "password": "jx123456!@#"
+}
+
+### 2.2 刷新Token
+POST {{baseUrl}}/auth/refresh?refreshToken=your_refresh_token
+Content-Type: application/json
+
+### 2.3 GitHub OAuth回调
+GET {{baseUrl}}/auth/github/callback?code=your_github_code
+
+### ============================================
+### 3. 用户管理接口
+### ============================================
+
+### 3.1 生成验证码
+GET {{baseUrl}}/user/authCode
+
+### 3.2 用户注册
+POST {{baseUrl}}/user/register
+Content-Type: application/json
+
+{
+  "nickname": "测试用户",
+  "mobile": "18888888889",
+  "password": "123456",
+  "passwordRepeat": "123456",
+  "authCode": "1234"
+}
+
+### 3.3 用户登录
+POST {{baseUrl}}/user/login
+Content-Type: application/json
+
+{
+  "username": "18888888889",
+  "password": "123456",
+  "authCode": "1234"
+}
+
+### 3.4 刷新Token
+GET {{baseUrl}}/user/refresh?token={{token}}
+Content-Type: application/json
+
+### 3.5 获取用户信息
+GET {{baseUrl}}/user/info
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 3.6 获取用户信息（指定ID）
+GET {{baseUrl}}/user/info?id=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 3.7 获取用户列表
+POST {{baseUrl}}/user/list
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "page": 1,
+  "pageSize": 10,
+  "mobile": "",
+  "username": ""
+}
+
+### 3.8 更新用户状态
+PATCH {{baseUrl}}/user/status
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "status": "ACTIVE"
+}
+
+### 3.9 更新用户信息
+PATCH {{baseUrl}}/user/edit
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "nickname": "更新后的用户名",
+  "intro": "用户简介",
+  "avatar": "https://example.com/avatar.jpg",
+  "homepage": "https://example.com"
+}
+
+### 3.10 修改密码
+PATCH {{baseUrl}}/user/password
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "passwordOld": "old_password",
+  "password": "new_password",
+  "passwordRepeat": "new_password"
+}
+
+### 3.11 重置密码
+POST {{baseUrl}}/user/resetPassword
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "mobile": "18888888889",
+  "nickname": "测试用户",
+  "authCode": "1234"
+}
+
+### 3.12 删除用户
+DELETE {{baseUrl}}/user?id=1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+### 3.13 发送邮箱验证码
+POST {{baseUrl}}/user/email/sendCode
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "type": "register"
+}
+
+### 3.14 邮箱注册
+POST {{baseUrl}}/user/email/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "nickname": "邮箱用户",
+  "password": "123456",
+  "passwordRepeat": "123456",
+  "verificationCode": "123456"
+}
+
+### 3.15 邮箱登录
+POST {{baseUrl}}/user/email/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "123456",
+  "verificationCode": "123456"
+}
+
+### 3.16 管理员创建用户
+POST {{baseUrl}}/user/admin/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nickname": "管理员创建用户",
+  "username": "admin_user",
+  "password": "123456",
+  "roleIds": [1, 2],
+  "deptId": 1,
+  "intro": "管理员创建的用户",
+  "avatar": "https://example.com/avatar.jpg"
+}
+
+### 3.17 管理员更新用户
+POST {{baseUrl}}/user/admin/update/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "nickname": "更新的管理员用户",
+  "roleIds": [1],
+  "deptId": 2,
+  "intro": "更新的用户简介",
+  "avatar": "https://example.com/new-avatar.jpg"
+}
+
+### ============================================
+### 4. 文章管理接口
+### ============================================
+
+### 4.1 获取文章列表（公开接口，支持分页和筛选）
+POST {{baseUrl}}/article/list
+Content-Type: application/json
+
+{
+  "page": 1,
+  "pageSize": 10,
+  "client": true
+}
+
+### 4.2 获取文章列表（带筛选条件）
+POST {{baseUrl}}/article/list
+Content-Type: application/json
+
+{
+  "page": 1,
+  "pageSize": 10,
+  "categoryId": 1,
+  "tagIds": [1, 2],
+  "title": "测试",
+  "sort": "DESC"
+}
+
+### 4.3 获取文章详情（通过ID）
+GET {{baseUrl}}/article/info?id=1
+Content-Type: application/json
+
+### 4.4 获取文章详情（通过标题）
+GET {{baseUrl}}/article/info?id=文章标题
+Content-Type: application/json
+
+### 4.5 创建文章（需要JWT认证）
+POST {{baseUrl}}/article/create
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "title": "测试文章标题",
+  "description": "这是一篇测试文章的描述",
+  "categoryId": 1,
+  "tagIds": [1, 2],
+  "content": "# 文章内容\n\n这是文章的Markdown内容",
+  "contentHtml": "<h1>文章内容</h1><p>这是文章的HTML内容</p>",
+  "cover": "https://example.com/cover.jpg",
+  "status": "publish"
+}
+
+### 4.6 编辑文章（需要JWT认证）
+POST {{baseUrl}}/article/edit
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "id": 1,
+  "title": "更新后的文章标题",
+  "description": "更新后的描述",
+  "categoryId": 2,
+  "tagIds": [2, 3],
+  "content": "# 更新后的内容",
+  "contentHtml": "<h1>更新后的内容</h1>",
+  "cover": "https://example.com/new-cover.jpg"
+}
+
+### 4.7 删除文章（需要JWT认证）
+DELETE {{baseUrl}}/article/delete?id=1
+Authorization: Bearer {{token}}
+
+### 4.8 文章访问量+1
+POST {{baseUrl}}/article/views?id=1
+Content-Type: application/json
+
+### 4.9 文章点赞+1
+POST {{baseUrl}}/article/likes?articleId=1&status=1
+Content-Type: application/json
+
+### 4.10 文章取消点赞-1
+POST {{baseUrl}}/article/likes?articleId=1&status=0
+Content-Type: application/json
+
+### 4.11 禁用文章（需要JWT认证）
+PATCH {{baseUrl}}/article/disabled?id=1&isDelete=true
+Authorization: Bearer {{token}}
+
+### 4.12 启用文章（需要JWT认证）
+PATCH {{baseUrl}}/article/disabled?id=1&isDelete=false
+Authorization: Bearer {{token}}
+
+### 4.13 置顶文章（需要JWT认证）
+PATCH {{baseUrl}}/article/topping?id=1&topping=true
+Authorization: Bearer {{token}}
+
+### 4.14 取消置顶（需要JWT认证）
+PATCH {{baseUrl}}/article/topping?id=1&topping=false
+Authorization: Bearer {{token}}
+
+
+### ============================================
+### 5. Swagger API 文档
+### ============================================
+
+# Swagger UI 地址: http://localhost:5001/swagger-ui.html
+# OpenAPI JSON: http://localhost:5001/v3/api-docs
+
+### 5.1 访问Swagger UI
+# 直接在浏览器中打开: http://localhost:5001/swagger-ui.html
+# 可以看到所有接口的详细文档，并且可以直接在线调试
+
+
+### ============================================
+### 6. 测试说明
+### ============================================
+
+# 使用步骤:
+# 1. 确保项目已启动 (端口 5001)
+# 2. 先调用登录接口获取token
+# 3. 将返回的token复制到上面的 @token 变量中
+# 4. 点击每个请求上方的 "Send Request" 按钮测试
+
+# 预期响应格式:
+# {
+#   "code": 200,
+#   "message": "success",
+#   "data": {...}
+# }
+
+# 文章列表响应示例:
+# {
+#   "code": 200,
+#   "message": "success",
+#   "data": {
+#     "list": [...],
+#     "pagination": {
+#       "page": 1,
+#       "pageSize": 10,
+#       "total": 100,
+#       "totalPage": 10
+#     }
+#   }
+# }

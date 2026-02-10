@@ -2,35 +2,56 @@ server:
   port: 5001
 
 spring:
+  application:
+    name: spring-boot-blog
+  profiles:
+    active: dev  # 设置默认环境
   datasource:
-    url: jdbc:mysql://127.0.0.1:3306/z_blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
-    username: jiangxia
-    password: "jiangxia123!@#"
+    url: ${DB_URL:jdbc:mysql://127.0.0.1:3306/z_blog?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai}
+    username: ${DB_USERNAME:jiangxia}
+    password: ${DB_PASSWORD:jiangxia123!@#}
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      max-lifetime: 600000
+      connection-timeout: 30000
+      validation-timeout: 5000
 
   jpa:
     hibernate:
       ddl-auto: none  # 使用现有表结构，不自动建表
-    show-sql: false
+    show-sql: ${SHOW_SQL:true}
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
+        naming:
+          physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
 
   data:
     redis:
-      host: 127.0.0.1
-      port: 6379
-      database: 1
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:1}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      jedis:
+        pool:
+          max-active: 20
+          max-idle: 10
+          min-idle: 5
+          max-wait: -1ms
 
   jackson:
     time-zone: Asia/Shanghai
     date-format: yyyy-MM-dd HH:mm:ss
 
   mail:
-    host: smtp.163.com
-    port: 465
-    username: jiang_xia_top@163.com
-    password: BCqhazrCuMmiZyvh
+    host: ${MAIL_HOST:smtp.163.com}
+    port: ${MAIL_PORT:465}
+    username: ${MAIL_USERNAME:jiang_xia_top@163.com}
+    password: ${MAIL_PASSWORD:BCqhazrCuMmiZyvh}
     properties:
       mail:
         smtp:
@@ -39,9 +60,41 @@ spring:
             enable: true
 
 jwt:
-  secret: xia-007
+  secret: ${JWT_SECRET:xia-007}
   # 8 小时，单位秒
-  expiration-seconds: 28800
+  expiration-seconds: ${JWT_EXPIRATION_SECONDS:28800}
 
 blog:
-  file-upload-path: d:/study/myGithub/blog-server/public/uploads/
+  file-upload-path: ${FILE_UPLOAD_PATH:d:/study/myGithub/blog-server/public/uploads/}
+
+# 日志配置 - 根据环境激活不同配置
+logging:
+  config: classpath:log4j2-${spring.profiles.active}.xml
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    enabled: true
+    path: /v3/api-docs
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    operations-sorter: method
+    tags-sorter: alpha
+
+# Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
